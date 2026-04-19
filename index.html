@@ -6,489 +6,528 @@
   <title>Banxa — Integration Qualifier</title>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      background: #0D0D0D;
-      color: #FFFFFF;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 2rem 1rem;
-    }
-
-    .logo {
-      font-size: 13px;
-      font-weight: 700;
-      letter-spacing: 4px;
-      color: #00D4D4;
-      margin-bottom: 2rem;
-      align-self: flex-start;
-      max-width: 680px;
-      width: 100%;
-    }
-
-    .page { width: 100%; max-width: 680px; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #0D0D0D; color: #FFFFFF; min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 2rem 1rem; }
+    .logo { font-size: 13px; font-weight: 700; letter-spacing: 4px; color: #00D4D4; margin-bottom: 2rem; align-self: flex-start; max-width: 640px; width: 100%; }
+    .page { width: 100%; max-width: 640px; }
 
     /* Mode selector */
     .mode-select { margin-bottom: 1.5rem; }
     .mode-label { font-size: 12px; color: #CCCCCC; letter-spacing: 0.05em; margin-bottom: 10px; }
     .mode-btns { display: flex; gap: 10px; }
-    .mode-btn {
-      flex: 1;
-      padding: 12px 16px;
-      border: 0.5px solid #2A2A2A;
-      border-radius: 10px;
-      background: #1A1A1A;
-      color: #CCCCCC;
-      font-size: 13px;
-      font-weight: 500;
-      cursor: pointer;
-      text-align: left;
-      transition: all 0.15s;
-      line-height: 1.4;
-    }
-    .mode-btn:hover { border-color: #888; color: #FFFFFF; }
+    .mode-btn { flex: 1; padding: 12px 16px; border: 0.5px solid #2A2A2A; border-radius: 10px; background: #1A1A1A; color: #CCCCCC; font-size: 13px; font-weight: 500; cursor: pointer; text-align: left; transition: all 0.15s; line-height: 1.4; }
+    .mode-btn:hover { border-color: #444; color: #FFFFFF; }
     .mode-btn.active { border-color: #00D4D4; color: #00D4D4; background: #0A2020; }
     .mode-btn strong { display: block; font-size: 14px; margin-bottom: 2px; color: #FFFFFF; }
+    .mode-btn.active strong { color: #00D4D4; }
 
-    /* Chat */
-    .chat-card {
-      background: #1A1A1A;
-      border: 0.5px solid #2A2A2A;
-      border-radius: 12px;
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
-      min-height: 480px;
-    }
+    .card { background: #1A1A1A; border: 0.5px solid #2A2A2A; border-radius: 12px; padding: 2rem; }
 
-    .messages {
-      flex: 1;
-      padding: 1.5rem;
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-      overflow-y: auto;
-      max-height: 520px;
-    }
+    /* Progress */
+    .progress { display: flex; gap: 6px; margin-bottom: 2rem; }
+    .progress-dot { height: 4px; flex: 1; border-radius: 2px; background: #2A2A2A; transition: background 0.3s; }
+    .progress-dot.done { background: #00D4D4; }
+    .progress-dot.active { background: #007A7A; }
 
-    .msg {
-      display: flex;
-      flex-direction: column;
-      max-width: 85%;
-    }
-    .msg.assistant { align-self: flex-start; }
-    .msg.user { align-self: flex-end; }
+    .q-label { font-size: 12px; color: #CCCCCC; margin-bottom: 6px; letter-spacing: 0.03em; }
+    .q-text { font-size: 20px; font-weight: 600; color: #FFFFFF; margin-bottom: 0.75rem; line-height: 1.35; }
+    .q-hint { font-size: 13px; color: #CCCCCC; margin-bottom: 1.5rem; line-height: 1.6; }
+    .q-multi-hint { font-size: 12px; color: #00D4D4; margin-bottom: 1rem; margin-top: -1rem; }
 
-    .msg-bubble {
-      padding: 11px 15px;
-      border-radius: 12px;
-      font-size: 14px;
-      line-height: 1.6;
-      white-space: pre-wrap;
-    }
-    .msg.assistant .msg-bubble {
-      background: #222222;
-      border: 0.5px solid #2A2A2A;
-      color: #FFFFFF;
-      border-top-left-radius: 4px;
-    }
-    .msg.user .msg-bubble {
-      background: #00D4D4;
-      color: #0D0D0D;
-      font-weight: 500;
-      border-top-right-radius: 4px;
-    }
+    /* Single select options */
+    .options { display: flex; flex-direction: column; gap: 8px; }
+    .opt { display: flex; align-items: flex-start; gap: 12px; padding: 13px 16px; border: 0.5px solid #2A2A2A; border-radius: 10px; cursor: pointer; background: #1A1A1A; transition: border-color 0.15s, background 0.15s; }
+    .opt:hover { border-color: #444; background: #222; }
+    .opt.sel-a { border-color: #00D4D4; background: #0A2020; }
+    .opt.sel-b { border-color: #00AACC; background: #0A1820; }
+    .opt.sel-c { border-color: #CC8800; background: #1A1200; }
+    .opt.sel-d { border-color: #888; background: #181818; }
+    .opt-dot { width: 20px; height: 20px; border-radius: 50%; border: 1.5px solid #444; flex-shrink: 0; margin-top: 1px; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; color: #888; transition: all 0.15s; }
+    .opt.sel-a .opt-dot { background: #00D4D4; border-color: #00D4D4; color: #0D0D0D; }
+    .opt.sel-b .opt-dot { background: #00AACC; border-color: #00AACC; color: #0D0D0D; }
+    .opt.sel-c .opt-dot { background: #CC8800; border-color: #CC8800; color: #FFF; }
+    .opt.sel-d .opt-dot { background: #555; border-color: #555; color: #FFF; }
+    .opt-title { font-size: 15px; font-weight: 600; color: #FFFFFF; }
+    .opt-desc { font-size: 13px; color: #CCCCCC; margin-top: 2px; line-height: 1.4; }
 
-    /* Verdict styling */
-    .verdict-block {
-      background: #111111;
-      border: 0.5px solid #2A2A2A;
-      border-radius: 10px;
-      padding: 14px 16px;
-      margin-top: 4px;
-      font-size: 13px;
-      line-height: 1.7;
-      color: #FFFFFF;
-      white-space: pre-wrap;
-    }
-    .verdict-fit { border-color: #00D4D4; }
-    .verdict-discuss { border-color: #CC8800; }
-    .verdict-notfit { border-color: #CC4444; }
+    /* Multi-select options */
+    .multi-options { display: flex; flex-direction: column; gap: 8px; }
+    .multi-opt { display: flex; align-items: center; gap: 12px; padding: 13px 16px; border: 0.5px solid #2A2A2A; border-radius: 10px; cursor: pointer; background: #1A1A1A; transition: border-color 0.15s, background 0.15s; }
+    .multi-opt:hover { border-color: #444; background: #222; }
+    .multi-opt.selected { border-color: #00D4D4; background: #0A2020; }
+    .multi-check { width: 20px; height: 20px; border-radius: 4px; border: 1.5px solid #444; flex-shrink: 0; display: flex; align-items: center; justify-content: center; transition: all 0.15s; }
+    .multi-opt.selected .multi-check { background: #00D4D4; border-color: #00D4D4; }
+    .multi-check svg { display: none; }
+    .multi-opt.selected .multi-check svg { display: block; }
+    .multi-title { font-size: 15px; font-weight: 600; color: #FFFFFF; }
+    .multi-desc { font-size: 13px; color: #CCCCCC; margin-top: 2px; line-height: 1.4; }
 
-    /* Typing indicator */
-    .typing {
-      display: flex;
-      align-items: center;
-      gap: 5px;
-      padding: 11px 15px;
-      background: #222222;
-      border: 0.5px solid #2A2A2A;
-      border-radius: 12px;
-      border-top-left-radius: 4px;
-      width: fit-content;
-    }
-    .typing span {
-      width: 6px; height: 6px;
-      background: #9A9A9A;
-      border-radius: 50%;
-      animation: bounce 1.2s infinite;
-    }
-    .typing span:nth-child(2) { animation-delay: 0.2s; }
-    .typing span:nth-child(3) { animation-delay: 0.4s; }
-    @keyframes bounce {
-      0%, 60%, 100% { transform: translateY(0); }
-      30% { transform: translateY(-5px); }
-    }
+    .nav { display: flex; justify-content: flex-end; margin-top: 1.5rem; }
+    .btn-next { padding: 10px 24px; font-size: 14px; font-weight: 600; border-radius: 8px; border: 0.5px solid #2A2A2A; background: #1A1A1A; color: #CCCCCC; cursor: default; opacity: 0.4; transition: all 0.15s; }
+    .btn-next.ready { opacity: 1; cursor: pointer; border-color: #00D4D4; color: #00D4D4; }
+    .btn-next.ready:hover { background: #0A2020; }
 
-    /* Input area */
-    .input-area {
-      padding: 1rem 1.25rem;
-      border-top: 0.5px solid #2A2A2A;
-      display: flex;
-      gap: 10px;
-      align-items: flex-end;
-    }
-    .input-area textarea {
-      flex: 1;
-      background: #111111;
-      border: 0.5px solid #2A2A2A;
-      border-radius: 8px;
-      color: #FFFFFF;
-      font-size: 14px;
-      font-family: inherit;
-      padding: 10px 14px;
-      resize: none;
-      min-height: 42px;
-      max-height: 120px;
-      line-height: 1.5;
-      outline: none;
-      transition: border-color 0.15s;
-    }
-    .input-area textarea:focus { border-color: #888; }
-    .input-area textarea::placeholder { color: #666; }
+    /* Results */
+    .result-badge { display: inline-block; font-size: 11px; font-weight: 700; letter-spacing: 0.05em; padding: 4px 12px; border-radius: 20px; margin-bottom: 14px; }
+    .badge-native  { background: #0A2020; color: #00D4D4; border: 0.5px solid #00D4D4; }
+    .badge-sdk     { background: #0A1820; color: #00AACC; border: 0.5px solid #00AACC; }
+    .badge-product { background: #1A1200; color: #CC8800; border: 0.5px solid #CC8800; }
+    .badge-checkout{ background: #1A0A20; color: #AA66CC; border: 0.5px solid #AA66CC; }
+    .badge-notfit  { background: #1A0A0A; color: #CC4444; border: 0.5px solid #CC4444; }
+    .badge-discuss { background: #1A1200; color: #CC8800; border: 0.5px solid #CC8800; }
+    .badge-rest    { background: #0A1020; color: #6699FF; border: 0.5px solid #6699FF; }
 
-    .send-btn {
-      width: 42px;
-      height: 42px;
-      background: #00D4D4;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-      transition: background 0.15s;
-    }
-    .send-btn:hover { background: #00AAAA; }
-    .send-btn:disabled { background: #1A3A3A; cursor: default; }
-    .send-btn svg { width: 18px; height: 18px; }
+    .result-title { font-size: 24px; font-weight: 700; color: #FFFFFF; margin-bottom: 10px; }
+    .result-sub { font-size: 15px; color: #CCCCCC; line-height: 1.65; margin-bottom: 1.5rem; }
 
-    .restart-btn {
-      margin-top: 1rem;
-      font-size: 13px;
-      color: #CCCCCC;
-      background: none;
-      border: none;
-      cursor: pointer;
-      text-decoration: underline;
-      text-underline-offset: 3px;
-      padding: 0;
-    }
-    .restart-btn:hover { color: #FFFFFF; }
+    /* Multi-path result blocks */
+    .path-block { border: 0.5px solid #2A2A2A; border-radius: 10px; overflow: hidden; margin-bottom: 14px; }
+    .path-block-head { padding: 12px 16px; background: #111; border-bottom: 0.5px solid #2A2A2A; display: flex; align-items: center; gap: 10px; }
+    .path-block-title { font-size: 15px; font-weight: 600; color: #FFFFFF; }
+    .path-block-body { padding: 14px 16px; font-size: 13px; color: #CCCCCC; line-height: 1.7; }
 
-    .empty-state {
-      flex: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #999;
-      font-size: 14px;
-      padding: 2rem;
-      text-align: center;
-    }
+    .outcomes { display: flex; flex-direction: column; gap: 10px; margin-bottom: 1.25rem; }
+    .outcome-row { display: flex; align-items: flex-start; gap: 10px; }
+    .outcome-check { width: 18px; height: 18px; border-radius: 50%; background: #0A2020; flex-shrink: 0; margin-top: 2px; display: flex; align-items: center; justify-content: center; }
+    .outcome-text { font-size: 14px; color: #FFFFFF; line-height: 1.5; }
+
+    .result-table { border: 0.5px solid #2A2A2A; border-radius: 10px; overflow: hidden; margin-bottom: 1rem; }
+    .result-table-head { padding: 10px 16px; background: #111; border-bottom: 0.5px solid #2A2A2A; font-size: 11px; font-weight: 700; letter-spacing: 0.05em; color: #CCCCCC; text-transform: uppercase; }
+    .result-row { display: flex; justify-content: space-between; align-items: flex-start; padding: 11px 16px; border-bottom: 0.5px solid #2A2A2A; gap: 16px; }
+    .result-row:last-child { border-bottom: none; }
+    .result-key { font-size: 13px; color: #CCCCCC; flex-shrink: 0; min-width: 110px; }
+    .result-val { font-size: 13px; color: #FFFFFF; text-align: right; line-height: 1.5; }
+
+    .note { font-size: 13px; color: #CCCCCC; line-height: 1.65; padding: 12px 16px; background: #111; border-radius: 8px; border: 0.5px solid #2A2A2A; margin-top: 12px; }
+    .product-note { font-size: 13px; color: #CCCCCC; line-height: 1.8; padding: 14px 16px; background: #1A1200; border-radius: 8px; border: 0.5px solid #CC8800; margin-top: 12px; }
+    .product-note strong { color: #CC8800; display: block; margin-bottom: 6px; font-size: 14px; }
+    .clarify-note { font-size: 13px; color: #CCCCCC; line-height: 1.8; padding: 14px 16px; background: #111; border-radius: 8px; border: 0.5px solid #2A2A2A; margin-top: 12px; }
+    .clarify-note strong { color: #CCCCCC; display: block; margin-bottom: 6px; }
+
+    .tech-toggle { font-size: 13px; color: #CCCCCC; cursor: pointer; display: flex; align-items: center; gap: 6px; background: none; border: none; padding: 0; margin-top: 12px; }
+    .tech-toggle:hover { color: #FFF; }
+    .tech-arrow { transition: transform 0.2s; }
+    .tech-arrow.open { transform: rotate(90deg); }
+    .tech-detail { display: none; margin-top: 12px; }
+    .tech-detail.open { display: block; }
+
+    .divider { height: 0.5px; background: #2A2A2A; margin: 1.5rem 0; }
+    .restart { font-size: 13px; color: #CCCCCC; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; background: none; border: none; padding: 0; }
+    .restart:hover { color: #FFF; }
+    .empty-state { text-align: center; padding: 3rem 1rem; color: #999; font-size: 14px; }
   </style>
 </head>
 <body>
   <div class="logo">BANXA</div>
   <div class="page">
-
     <div class="mode-select">
       <p class="mode-label">SELECT QUALIFIER</p>
       <div class="mode-btns">
         <button class="mode-btn" id="btn-native" onclick="selectMode('native')">
-          <strong>Banxa Native fit check</strong>
+          <strong>Banxa Native</strong>
           Is this partner right for Banxa Native?
         </button>
         <button class="mode-btn" id="btn-general" onclick="selectMode('general')">
-          <strong>General integration options</strong>
-          Which Banxa product fits this partner?
+          <strong>Banxa Checkout</strong>
+          Which Checkout integration fits this partner?
         </button>
       </div>
     </div>
-
-    <div class="chat-card">
-      <div class="messages" id="messages">
-        <div class="empty-state">Select a qualifier above to begin</div>
-      </div>
-      <div class="input-area">
-        <textarea id="input" placeholder="Type your answer..." rows="1" onkeydown="handleKey(event)" oninput="autoResize(this)" disabled></textarea>
-        <button class="send-btn" id="send-btn" onclick="sendMessage()" disabled>
-          <svg viewBox="0 0 24 24" fill="none" stroke="#0D0D0D" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <line x1="22" y1="2" x2="11" y2="13"></line>
-            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
-          </svg>
-        </button>
-      </div>
+    <div class="card" id="card">
+      <div class="empty-state">Select a qualifier above to begin</div>
     </div>
-
-    <button class="restart-btn" id="restart-btn" onclick="restart()" style="display:none">← Start over</button>
+    <button class="restart" id="restart-btn" onclick="restart()" style="display:none;margin-top:1rem">← Start over</button>
   </div>
 
-  <script>
-    const SYSTEM_NATIVE = `You are a qualification tool for Banxa Native, a headless ramp infrastructure product for partners embedding fiat ↔ crypto into their mobile app.
+<script>
+  let mode = null, answers = {}, multiAnswers = {};
 
-Your job is to ask a short series of questions to determine whether a partner is a fit for Banxa Native, and if so, confirm the integration requirements. Output a clear verdict and a plain-language summary the BD team can use in the conversation.
+  const yn = (yes, no) => [
+    { val:'a', cls:'sel-a', label: yes },
+    { val:'b', cls:'sel-b', label: no },
+    { val:'c', cls:'sel-c', label:'Not sure' },
+  ];
 
-Ask the following questions one at a time, in order. Wait for an answer before continuing.
+  // Native: 0=kyc, 1=backend, 2=uid, 3=eng, 4=platform(multi)
+  const nativeQs = [
+    { q:"Does the partner do KYC?", hint:"Do they collect and verify user identity — name, address, documents — either directly or via a provider like Sumsub?", type:'single', opts: yn("Yes — they verify user identity","No — they don't do KYC") },
+    { q:"Does the partner have a backend server?", hint:"Required for HMAC server-to-server authentication with the Banxa eAPI.", type:'single', opts: yn("Yes — they have a backend","No — client-side only") },
+    { q:"Does the partner have a unique, persistent identifier per user?", hint:"E.g. a user account ID. Some wallets identify users only by wallet address with no persistent account model.", type:'single', opts:[
+      { val:'a', cls:'sel-a', label:"Yes — they have user accounts", desc:"Each user has a stable unique ID" },
+      { val:'b', cls:'sel-b', label:"No — wallet address only", desc:"No persistent account model" },
+      { val:'c', cls:'sel-c', label:"Not sure" },
+    ]},
+    { q:"Does the partner have engineering resource to integrate?", hint:"The fully native path requires API + SDK implementation work.", type:'single', opts: yn("Yes — they have engineering capacity","No — limited engineering resource") },
+    { q:"What platform(s) is the partner building on?", hint:"The Banxa SDK is React Native today — web and native iOS/Android are on the roadmap. Select all that apply.", type:'multi', opts:[
+      { val:'rn',  label:'React Native', desc:'Cross-platform mobile using React Native' },
+      { val:'web', label:'Web', desc:'Browser-based — web app or dApp' },
+      { val:'ios', label:'iOS (native)', desc:'Native Swift or Objective-C' },
+      { val:'and', label:'Android (native)', desc:'Native Kotlin or Java' },
+    ]},
+  ];
 
-1. What technology is the partner's app built on? (React Native, web, native iOS/Android, or something else?) The SDK is React Native only today — web and native iOS/Android are on the roadmap.
+  // Checkout: 0=kyc, 1=backend, 2=webhooks, 3=eng, 4=ttm, 5=platform(multi)
+  const generalQs = [
+    { q:"Does the partner do KYC?", hint:"Do they verify user identity — either directly or via a provider like Sumsub?", type:'single', opts: yn("Yes — they verify user identity","No — they don't do KYC") },
+    { q:"Does the partner have a backend server?", hint:"A backend enables KYC sharing and signed webhooks via HMAC. Most REST API flows work client-side without one.", type:'single', opts: yn("Yes — they have a backend","No — client-side only") },
+    { q:"Do they need real-time order status updates (webhooks)?", hint:"Webhooks push transaction status changes to the partner's system automatically.", type:'single', opts: yn("Yes — they need webhooks","No — not required") },
+    { q:"Does the partner have engineering resource to integrate?", hint:"Some paths require significantly more implementation work than others.", type:'single', opts: yn("Yes — they have engineering capacity","No — minimal engineering resource") },
+    { q:"When is the partner looking to go live?", hint:"Timeline affects which integration path is realistic.", type:'single', opts:[
+      { val:'a', cls:'sel-a', label:'As soon as possible' },
+      { val:'b', cls:'sel-b', label:'Within 3 months' },
+      { val:'c', cls:'sel-c', label:'3–6 months' },
+      { val:'d', cls:'sel-d', label:'No fixed timeline' },
+    ]},
+    { q:"What platform(s) is the partner building on?", hint:"Select all that apply — we'll show the right path for each surface.", type:'multi', opts:[
+      { val:'rn',  label:'React Native', desc:'Cross-platform mobile using React Native' },
+      { val:'web', label:'Web', desc:'Browser-based — web app or dApp' },
+      { val:'ios', label:'iOS (native)', desc:'Native Swift or Objective-C' },
+      { val:'and', label:'Android (native)', desc:'Native Kotlin or Java' },
+    ]},
+  ];
 
-2. Does the partner verify user identity (KYC)? This means collecting and checking personal details and documents — either directly or through a provider like Sumsub.
+  function selectMode(m) {
+    mode = m;
+    document.getElementById('btn-native').classList.toggle('active', m==='native');
+    document.getElementById('btn-general').classList.toggle('active', m==='general');
+    restart();
+  }
 
-3. Does the partner have backend infrastructure that can make server-to-server API calls?
+  function restart() {
+    answers = {}; multiAnswers = {};
+    document.getElementById('restart-btn').style.display = 'none';
+    if (mode) renderStep(0);
+  }
 
-4. Does the partner have a unique, stable identifier for each of their users (for example, an account ID or user ID — not just a wallet address)?
+  function renderStep(step) {
+    const qs = mode==='native' ? nativeQs : generalQs;
+    const q = qs[step];
+    const total = qs.length;
+    const dots = Array.from({length:total},(_,i)=>`<div class="progress-dot ${i<step?'done':i===step?'active':''}"></div>`).join('');
+    const isLast = step === total - 1;
 
-5. Does the partner's team have engineering resource available to implement an API + SDK integration?
-
-After all five answers, output:
-
----
-VERDICT: [FIT / NOT A FIT / DISCUSS FURTHER]
-
-Summary:
-[2-3 sentences describing whether the partner is a fit for Banxa Native and why, in plain language a BD person can use in conversation]
-
-If NOT A FIT, add:
-Suggested next step:
-[One sentence on where to route the conversation]
-
-If DISCUSS FURTHER, add:
-Open question:
-[The specific thing to flag to the product team]
----
-
-Rules:
-- Keep questions conversational, not clinical
-- Don't explain why you're asking each question
-- Don't output the verdict until all five questions are answered
-- Verdict of NOT A FIT if: no KYC, no backend, or no persistent user ID
-- Verdict of DISCUSS FURTHER if: they do KYC and have a backend but lack a persistent user ID, or they don't have a mobile app yet
-- Verdict of FIT if: yes to all five`;
-
-    const SYSTEM_GENERAL = `You are a qualification tool for Banxa's partner integration options. Banxa has four integration products:
-
-1. Banxa Checkout — Referral: URL-based, no backend needed, fastest to market. No webhooks or order lookup. Best for partners who want to go live quickly with minimal engineering.
-
-2. Banxa Checkout — REST API: Server-to-server, full control. Webhooks, KYC sharing, quote UI, order history. Best for partners who want programmatic control and real-time order status.
-
-3. Banxa Checkout — React Native SDK: Wraps the REST API for mobile apps. Type-safe, handles WebView plumbing, no backend needed for core flows. Best for mobile-first partners who want fast integration with native feel.
-
-4. Banxa Native: Headless ramp infrastructure for partners who do KYC and have a backend. Full UX control, native payment sheet (cards, Apple Pay, Google Pay), no Banxa-branded screens. Requires engineering capability.
-
-Your job is to ask a short series of questions and recommend the right product or combination.
-
-Ask one at a time, in order:
-
-1. What technology is the partner's app built on? Options: React Native, web, native iOS/Android, or a combination. Note: the SDK is React Native only today — web (JS SDK) and native iOS/Android are on the roadmap.
-
-2. Does the partner's platform verify user identity (KYC)? Either directly or through a provider like Sumsub?
-
-3. Does the partner have backend infrastructure for server-to-server API calls?
-
-4. Does the partner need real-time order status updates pushed to their system (webhooks)?
-
-5. Does the partner have engineering resource available for integration work?
-
-After all five answers, output:
-
----
-RECOMMENDED PATH: [Product name]
-
-Why:
-[2-3 sentences explaining why this path fits]
-
-What they get:
-[2-3 bullet points on key outcomes]
-
-If relevant, add:
-Also consider:
-[One sentence on an adjacent option]
----
-
-Rules:
-- Route to Banxa Native only if: they do KYC AND have a backend AND are building a mobile app
-- Route to React Native SDK if: mobile app, no KYC requirement, has engineering resource
-- Route to REST API if: web or both platforms, has backend, needs webhooks or KYC sharing
-- Route to Referral if: wants fastest path, no webhooks needed, minimal engineering
-- Never recommend Banxa Native to partners who don't do KYC
-- Keep the tone conversational and concise`;
-
-    let mode = null;
-    let history = [];
-    let loading = false;
-
-    function selectMode(m) {
-      mode = m;
-      document.getElementById('btn-native').classList.toggle('active', m === 'native');
-      document.getElementById('btn-general').classList.toggle('active', m === 'general');
-      restart();
+    let body = '';
+    if (q.type === 'multi') {
+      body = `<p class="q-multi-hint">Select all that apply</p>
+        <div class="multi-options">
+          ${q.opts.map(o=>`
+            <div class="multi-opt" id="mopt-${o.val}" onclick="toggleMulti('${o.val}', ${step})">
+              <div class="multi-check"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l3 3 5-6" stroke="#0D0D0D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+              <div>
+                <div class="multi-title">${o.label}</div>
+                ${o.desc ? `<div class="multi-desc">${o.desc}</div>` : ''}
+              </div>
+            </div>`).join('')}
+        </div>`;
+    } else {
+      body = `<div class="options">
+        ${q.opts.map((o,i)=>`
+          <div class="opt" id="opt-${i}" onclick="selectOpt(${i},'${o.val}','${o.cls||'sel-a'}',${step})">
+            <div class="opt-dot">${i+1}</div>
+            <div>
+              <div class="opt-title">${o.label}</div>
+              ${o.desc ? `<div class="opt-desc">${o.desc}</div>` : ''}
+            </div>
+          </div>`).join('')}
+      </div>`;
     }
 
-    function restart() {
-      history = [];
-      const msgs = document.getElementById('messages');
-      msgs.innerHTML = '';
-      document.getElementById('input').disabled = false;
-      document.getElementById('send-btn').disabled = false;
-      document.getElementById('restart-btn').style.display = 'none';
-      if (mode) startConversation();
-    }
+    document.getElementById('card').innerHTML = `
+      <div class="progress">${dots}</div>
+      <p class="q-label">Question ${step+1} of ${total}</p>
+      <p class="q-text">${q.q}</p>
+      <p class="q-hint">${q.hint}</p>
+      ${body}
+      <div class="nav"><button class="btn-next" id="btn-next" onclick="advance(${step},${total})">${isLast?'See recommendation →':'Next →'}</button></div>`;
 
-    async function startConversation() {
-      await callClaude('Start the qualification. Ask the first question.');
-    }
-
-    function addMessage(role, text, isVerdict) {
-      const msgs = document.getElementById('messages');
-
-      // Remove empty state
-      const empty = msgs.querySelector('.empty-state');
-      if (empty) empty.remove();
-
-      const wrapper = document.createElement('div');
-      wrapper.className = `msg ${role}`;
-
-      if (role === 'assistant' && isVerdict) {
-        const bubble = document.createElement('div');
-        bubble.className = 'msg-bubble';
-        bubble.textContent = text.split('---')[0].trim();
-        wrapper.appendChild(bubble);
-
-        const verdict = document.createElement('div');
-        const verdictText = text.includes('---') ? text.split('---')[1].trim() : '';
-        if (verdictText) {
-          verdict.className = 'verdict-block';
-          if (verdictText.includes('FIT\n') && !verdictText.includes('NOT A FIT') && !verdictText.includes('DISCUSS')) verdict.classList.add('verdict-fit');
-          else if (verdictText.includes('NOT A FIT')) verdict.classList.add('verdict-notfit');
-          else if (verdictText.includes('DISCUSS FURTHER') || verdictText.includes('RECOMMENDED PATH')) verdict.classList.add('verdict-discuss');
-          verdict.textContent = verdictText;
-          wrapper.appendChild(verdict);
-        }
-      } else {
-        const bubble = document.createElement('div');
-        bubble.className = 'msg-bubble';
-        bubble.textContent = text;
-        wrapper.appendChild(bubble);
-      }
-
-      msgs.appendChild(wrapper);
-      msgs.scrollTop = msgs.scrollHeight;
-      return wrapper;
-    }
-
-    function showTyping() {
-      const msgs = document.getElementById('messages');
-      const t = document.createElement('div');
-      t.className = 'msg assistant';
-      t.id = 'typing';
-      t.innerHTML = '<div class="typing"><span></span><span></span><span></span></div>';
-      msgs.appendChild(t);
-      msgs.scrollTop = msgs.scrollHeight;
-    }
-
-    function removeTyping() {
-      const t = document.getElementById('typing');
-      if (t) t.remove();
-    }
-
-    async function callClaude(userMsg) {
-      if (loading) return;
-      loading = true;
-
-      const systemPrompt = mode === 'native' ? SYSTEM_NATIVE : SYSTEM_GENERAL;
-
-      history.push({ role: 'user', content: userMsg });
-      showTyping();
-
-      document.getElementById('input').disabled = true;
-      document.getElementById('send-btn').disabled = true;
-
-      try {
-        const res = await fetch('https://api.anthropic.com/v1/messages', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            model: 'claude-sonnet-4-20250514',
-            max_tokens: 1000,
-            system: systemPrompt,
-            messages: history
-          })
+    // For multi, always ready (can proceed with no selection = unsure)
+    if (q.type === 'multi') {
+      document.getElementById('btn-next').classList.add('ready');
+      // Restore selections
+      if (multiAnswers[step]) {
+        multiAnswers[step].forEach(v => {
+          document.getElementById('mopt-'+v)?.classList.add('selected');
         });
+      }
+    } else if (answers[step]) {
+      const qs2 = mode==='native' ? nativeQs : generalQs;
+      const idx = qs2[step].opts.findIndex(o => o.val === answers[step].val);
+      if (idx >= 0) selectOpt(idx, answers[step].val, answers[step].cls || 'sel-a', step);
+    }
+  }
 
-        const data = await res.json();
-        const reply = data.content?.[0]?.text || 'Something went wrong — please try again.';
+  function selectOpt(idx, val, cls, step) {
+    const qs = mode==='native' ? nativeQs : generalQs;
+    qs[step].opts.forEach((_,i) => { document.getElementById('opt-'+i)?.setAttribute('class','opt'); });
+    document.getElementById('opt-'+idx)?.classList.add(cls);
+    answers[step] = {val, cls};
+    document.getElementById('btn-next')?.classList.add('ready');
+  }
 
-        removeTyping();
-        history.push({ role: 'assistant', content: reply });
+  function toggleMulti(val, step) {
+    if (!multiAnswers[step]) multiAnswers[step] = [];
+    const el = document.getElementById('mopt-'+val);
+    if (multiAnswers[step].includes(val)) {
+      multiAnswers[step] = multiAnswers[step].filter(v => v !== val);
+      el?.classList.remove('selected');
+    } else {
+      multiAnswers[step].push(val);
+      el?.classList.add('selected');
+    }
+  }
 
-        const isVerdict = reply.includes('VERDICT:') || reply.includes('RECOMMENDED PATH:');
-        addMessage('assistant', reply, isVerdict);
+  function advance(step, total) {
+    const qs = mode==='native' ? nativeQs : generalQs;
+    if (qs[step].type === 'single' && !answers[step]) return;
+    if (step+1 >= total) showResult();
+    else renderStep(step+1);
+  }
 
-        if (isVerdict) {
-          document.getElementById('input').disabled = true;
-          document.getElementById('send-btn').disabled = true;
-          document.getElementById('restart-btn').style.display = 'block';
-        } else {
-          document.getElementById('input').disabled = false;
-          document.getElementById('send-btn').disabled = false;
-          document.getElementById('input').focus();
+  // ── Helpers ────────────────────────────────────────────────────────────────
+  const chkCyan = `<svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l3 3 5-6" stroke="#00D4D4" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+  const out = t => `<div class="outcome-row"><div class="outcome-check">${chkCyan}</div><span class="outcome-text">${t}</span></div>`;
+  const row = (k,v) => `<div class="result-row"><span class="result-key">${k}</span><span class="result-val">${v}</span></div>`;
+  const tech = rows => `
+    <button class="tech-toggle" onclick="toggleTech(this)"><span class="tech-arrow">›</span><span class="tech-lbl">Show technical details</span></button>
+    <div class="tech-detail"><div class="result-table"><div class="result-table-head">Technical setup</div>${rows}</div></div>`;
+  const productNote = items => `<div class="product-note"><strong>Speak to the product team</strong>${items.map(i=>'• '+i).join('<br>')}</div>`;
+  const clarifyNote = items => `<div class="clarify-note"><strong>Things to clarify</strong><br>${items.map(i=>'• '+i).join('<br>')}</div>`;
+
+  function toggleTech(btn) {
+    const d = btn.nextElementSibling;
+    const open = d.classList.toggle('open');
+    btn.querySelector('.tech-arrow').classList.toggle('open', open);
+    btn.querySelector('.tech-lbl').textContent = open ? 'Hide technical details' : 'Show technical details';
+  }
+
+  function pathBlock(badgeHtml, title, body) {
+    return `<div class="path-block">
+      <div class="path-block-head">${badgeHtml}<span class="path-block-title">${title}</span></div>
+      <div class="path-block-body">${body}</div>
+    </div>`;
+  }
+
+  function showResult() {
+    document.getElementById('restart-btn').style.display = 'block';
+    mode==='native' ? nativeResult() : generalResult();
+  }
+
+  // ── Native result ──────────────────────────────────────────────────────────
+  function nativeResult() {
+    const kyc      = answers[0]?.val;
+    const backend  = answers[1]?.val;
+    const uid      = answers[2]?.val;
+    const eng      = answers[3]?.val;
+    const platforms = multiAnswers[4] || [];
+
+    const hasRN  = platforms.includes('rn');
+    const hasWeb = platforms.includes('web');
+    const hasIOS = platforms.includes('ios');
+    const hasAnd = platforms.includes('and');
+    const hasNativeMobile = hasIOS || hasAnd;
+    const clarify = [], pNote = [];
+    let html = '';
+
+    if (kyc === 'b') {
+      html = `<span class="result-badge badge-notfit">NOT A FIT — BANXA NATIVE</span>
+        <p class="result-title">Banxa Native isn't the right path</p>
+        <p class="result-sub">Banxa Native requires the partner to own identity verification. Without KYC, the partner would need Banxa to manage compliance. Run the Banxa Checkout qualifier instead.</p>
+        <p class="note">Run the Banxa Checkout qualifier to find the right path for this partner.</p>`;
+
+    } else if (backend === 'b') {
+      html = `<span class="result-badge badge-notfit">NOT A FIT — BANXA NATIVE</span>
+        <p class="result-title">Banxa Native isn't the right path</p>
+        <p class="result-sub">A backend is required for HMAC server-to-server authentication with the eAPI. Without it, the fully native path isn't available as a standard integration.</p>
+        <p class="note">Run the Banxa Checkout qualifier to find the right path for this partner.</p>`;
+
+    } else {
+      // Collect clarify items
+      if (kyc === 'c')     clarify.push('Confirm whether the partner does KYC — this is the core requirement');
+      if (backend === 'c') clarify.push('Confirm backend infrastructure — required for HMAC server-to-server auth');
+      if (uid === 'c')     clarify.push('Clarify how the partner identifies users — account ID, wallet address, or something else?');
+      if (uid === 'b')     pNote.push('Wallet-based identity (no persistent user ID) may be supported — confirm with product before proceeding');
+      if (eng === 'b' || eng === 'c') clarify.push('Confirm engineering capacity — who would own the integration?');
+
+      const coreReady = kyc === 'a' && backend === 'a';
+
+      if (!coreReady) {
+        html = `<span class="result-badge badge-discuss">DISCUSS FURTHER</span>
+          <p class="result-title">Potential fit — needs clarification</p>
+          <p class="result-sub">The signals are positive but key details need to be confirmed before routing to Banxa Native.</p>
+          ${clarify.length ? clarifyNote(clarify) : ''}
+          ${pNote.length ? productNote(pNote) : ''}`;
+      } else {
+        // Core is ready — assess by platform
+        const blocks = [];
+
+        if (hasRN) {
+          const isStandard = uid === 'a';
+          const isWallet = uid === 'b';
+          if (isStandard) {
+            blocks.push(pathBlock(
+              `<span class="result-badge badge-native" style="margin-bottom:0">FULLY NATIVE — AVAILABLE NOW</span>`,
+              'React Native',
+              `<div class="outcomes" style="margin-bottom:1rem">
+                ${out("Users never leave the partner's app")}
+                ${out("Native payment sheet — cards, Apple Pay, Google Pay")}
+                ${out("Headless bank transfers — no hosted checkout")}
+                ${out("Partner's existing KYC reused — no duplicate verification")}
+              </div>
+              ${tech(row('Auth','HMAC server-to-server')+row('Identity & KYC','eAPI — token share, reliance, or doc share')+row('Pricing & eligibility','eAPI')+row('Bank transfers','eAPI — fully API-driven')+row('Cards / AP / GP','SDK — Primer native sheet')+row('Status updates','Webhooks + eAPI endpoints'))}`
+            ));
+          } else if (isWallet) {
+            blocks.push(pathBlock(
+              `<span class="result-badge badge-native" style="margin-bottom:0">FULLY NATIVE — SPEAK TO PRODUCT</span>`,
+              'React Native (wallet-based identity)',
+              `Fully native path is viable — wallet-based identity is supported but needs to be confirmed case by case with the product team before proceeding.
+              ${productNote(['Wallet-based identity setup confirmed case by case — flag before proceeding'])}`
+            ));
+          }
         }
 
-      } catch (err) {
-        removeTyping();
-        addMessage('assistant', 'Something went wrong — please refresh and try again.');
+        if (hasWeb) {
+          blocks.push(pathBlock(
+            `<span class="result-badge badge-product" style="margin-bottom:0">ON THE ROADMAP</span>`,
+            'Web',
+            `A JS SDK for web is in development. Bank transfers via eAPI can be supported now if the backend is ready. Flag to the product team to provide a timeline based on this opportunity.
+            ${productNote(['JS SDK for web in development — request ETA for this partner','Bank transfers via eAPI available now if backend ready'])}`
+          ));
+        }
+
+        if (hasNativeMobile) {
+          const which = [hasIOS ? 'iOS' : '', hasAnd ? 'Android' : ''].filter(Boolean).join(' and ');
+          blocks.push(pathBlock(
+            `<span class="result-badge badge-product" style="margin-bottom:0">ON THE ROADMAP</span>`,
+            `${which} (native)`,
+            `Native ${which} SDK support is on the roadmap. Flag this to the product team — we can assess prioritisation based on the opportunity size.
+            ${productNote([`Native ${which} SDK on roadmap — share opportunity size for prioritisation`,'eAPI flows (bank transfers, pricing, eligibility) may be available now if they have a backend'])}`
+          ));
+        }
+
+        if (!blocks.length) {
+          clarify.push('Confirm the platform — no platform was selected');
+        }
+
+        if (blocks.length) {
+          html = `<span class="result-badge badge-native">BANXA NATIVE</span>
+            <p class="result-title">Integration paths by platform</p>
+            <p class="result-sub">The partner meets the core requirements. Here's what's available across their platform(s).</p>
+            ${blocks.join('')}`;
+        } else {
+          html = `<span class="result-badge badge-discuss">DISCUSS FURTHER</span>
+            <p class="result-title">Core requirements met — platform to confirm</p>
+            <p class="result-sub">KYC and backend are confirmed. Platform details needed to advise on availability and timeline.</p>`;
+        }
+
+        if (clarify.length) html += clarifyNote(clarify);
+        if (pNote.length && !hasRN) html += productNote(pNote);
       }
-
-      loading = false;
     }
 
-    async function sendMessage() {
-      const input = document.getElementById('input');
-      const text = input.value.trim();
-      if (!text || loading) return;
+    html += `<div class="divider"></div><button class="restart" onclick="restart()">← Start over</button>`;
+    document.getElementById('card').innerHTML = html;
+  }
 
-      input.value = '';
-      autoResize(input);
-      addMessage('user', text);
-      await callClaude(text);
-    }
+  // ── General/Checkout result ────────────────────────────────────────────────
+  function generalResult() {
+    const kyc      = answers[0]?.val;
+    const backend  = answers[1]?.val;
+    const webhooks = answers[2]?.val;
+    const eng      = answers[3]?.val;
+    const ttm      = answers[4]?.val; // a=asap, b=3mo, c=3-6mo, d=no timeline
+    const platforms = multiAnswers[5] || [];
 
-    function handleKey(e) {
-      if (e.key === 'Enter' && !e.shiftKey) {
-        e.preventDefault();
-        sendMessage();
+    const hasRN  = platforms.includes('rn');
+    const hasWeb = platforms.includes('web');
+    const hasIOS = platforms.includes('ios');
+    const hasAnd = platforms.includes('and');
+    const hasNativeMobile = hasIOS || hasAnd;
+    const asap = ttm === 'a';
+    const hasEng = eng === 'a';
+    const hasBackend = backend === 'a';
+    const hasKyc = kyc === 'a';
+    const needsWebhooks = webhooks === 'a';
+    const clarify = [];
+    const blocks = [];
+    let html = '';
+
+    // React Native
+    if (hasRN) {
+      if (hasKyc && hasBackend) {
+        blocks.push(pathBlock(
+          `<span class="result-badge badge-native" style="margin-bottom:0">BANXA NATIVE</span>`,
+          'React Native',
+          `The partner does KYC and has a backend — consider Banxa Native for the full headless experience. Run the Banxa Native qualifier for a detailed recommendation.`
+        ));
+      } else {
+        blocks.push(pathBlock(
+          `<span class="result-badge badge-sdk" style="margin-bottom:0">REACT NATIVE SDK</span>`,
+          'React Native',
+          `<div class="outcomes" style="margin-bottom:0.75rem">
+            ${out("Native feel without KYC infrastructure")}
+            ${out("WebView handled by SDK — no plumbing to build")}
+            ${out("No backend required for core flows")}
+            ${out("Banxa handles compliance end to end")}
+          </div>`
+        ));
       }
     }
 
-    function autoResize(el) {
-      el.style.height = 'auto';
-      el.style.height = Math.min(el.scrollHeight, 120) + 'px';
+    // Web
+    if (hasWeb) {
+      if (!hasEng && asap && !hasKyc && !needsWebhooks) {
+        blocks.push(pathBlock(
+          `<span class="result-badge badge-checkout" style="margin-bottom:0">REFERRAL</span>`,
+          'Web',
+          `Minimal engineering, no KYC or webhooks needed, and wants to go live fast. URL-based referral is the quickest path — no integration work required beyond adding a link. No webhooks or order lookup available on this path.<br><br>
+          <div class="product-note" style="margin-top:0.5rem"><strong>Coming soon</strong>JS SDK for web will open up more native options — flag if they want to upgrade later</div>`
+        ));
+      } else {
+        const backendNote = (hasKyc || needsWebhooks) && !hasBackend
+          ? '<br><br><strong style="color:#CC8800">Note:</strong> A backend is required for KYC sharing and signed webhooks — confirm this is in scope.'
+          : '';
+        blocks.push(pathBlock(
+          `<span class="result-badge badge-rest" style="margin-bottom:0">REST API</span>`,
+          'Web',
+          `<div class="outcomes" style="margin-bottom:0.75rem">
+            ${out("Full control over order lifecycle")}
+            ${needsWebhooks ? out("Webhooks for real-time status updates" + (hasBackend ? "" : " — requires backend")) : out("Core flows work client-side without a backend")}
+            ${hasKyc ? out("KYC sharing supported" + (hasBackend ? "" : " — requires backend")) : ""}
+          </div>
+          <div class="product-note" style="margin-top:0"><strong>Coming soon</strong>JS SDK for web is in development — flag if the partner wants a more native web experience</div>${backendNote}`
+        ));
+      }
     }
-  </script>
+
+    // Native iOS / Android
+    if (hasNativeMobile) {
+      const which = [hasIOS ? 'iOS' : '', hasAnd ? 'Android' : ''].filter(Boolean).join(' and ');
+      blocks.push(pathBlock(
+        `<span class="result-badge badge-product" style="margin-bottom:0">SPEAK TO PRODUCT</span>`,
+        `${which} (native)`,
+        `Native ${which} SDK support is on the roadmap. Flag to the product team with the opportunity size — we can share a timeline and discuss prioritisation.
+        ${productNote([`Native ${which} SDK on roadmap — share opportunity size for prioritisation`])}`
+      ));
+    }
+
+    if (kyc === 'c') clarify.push('Confirm whether the partner does KYC — affects routing between Native and Checkout');
+    if (backend === 'c') clarify.push('Confirm backend infrastructure');
+    if (!platforms.length) clarify.push('No platform selected — confirm the tech stack to give a firm recommendation');
+
+    if (blocks.length) {
+      html = `<span class="result-badge badge-sdk">BANXA CHECKOUT</span>
+        <p class="result-title">Integration options by platform</p>
+        <p class="result-sub">Based on what we know, here's the recommended path for each of the partner's platforms.</p>
+        ${blocks.join('')}`;
+    } else {
+      html = `<span class="result-badge badge-discuss">DISCUSS FURTHER</span>
+        <p class="result-title">More information needed</p>
+        <p class="result-sub">Not enough detail to make a firm recommendation yet.</p>`;
+    }
+
+    if (clarify.length) html += clarifyNote(clarify);
+    html += `<div class="divider"></div><button class="restart" onclick="restart()">← Start over</button>`;
+    document.getElementById('card').innerHTML = html;
+  }
+</script>
 </body>
 </html>
