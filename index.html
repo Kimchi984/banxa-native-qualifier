@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Banxa Native — Integration Qualifier</title>
+  <title>Banxa — Integration Qualifier</title>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -13,14 +13,9 @@
       color: #FFFFFF;
       min-height: 100vh;
       display: flex;
+      flex-direction: column;
       align-items: center;
-      justify-content: center;
       padding: 2rem 1rem;
-    }
-
-    .page {
-      width: 100%;
-      max-width: 600px;
     }
 
     .logo {
@@ -28,511 +23,471 @@
       font-weight: 700;
       letter-spacing: 4px;
       color: #00D4D4;
-      margin-bottom: 2.5rem;
+      margin-bottom: 2rem;
+      align-self: flex-start;
+      max-width: 680px;
+      width: 100%;
     }
 
-    .card {
+    .page { width: 100%; max-width: 680px; }
+
+    /* Mode selector */
+    .mode-select { margin-bottom: 1.5rem; }
+    .mode-label { font-size: 12px; color: #CCCCCC; letter-spacing: 0.05em; margin-bottom: 10px; }
+    .mode-btns { display: flex; gap: 10px; }
+    .mode-btn {
+      flex: 1;
+      padding: 12px 16px;
+      border: 0.5px solid #2A2A2A;
+      border-radius: 10px;
+      background: #1A1A1A;
+      color: #CCCCCC;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      text-align: left;
+      transition: all 0.15s;
+      line-height: 1.4;
+    }
+    .mode-btn:hover { border-color: #888; color: #FFFFFF; }
+    .mode-btn.active { border-color: #00D4D4; color: #00D4D4; background: #0A2020; }
+    .mode-btn strong { display: block; font-size: 14px; margin-bottom: 2px; color: #FFFFFF; }
+
+    /* Chat */
+    .chat-card {
       background: #1A1A1A;
       border: 0.5px solid #2A2A2A;
       border-radius: 12px;
-      padding: 2rem;
-    }
-
-    /* Progress */
-    .progress {
-      display: flex;
-      gap: 6px;
-      margin-bottom: 2rem;
-    }
-    .progress-dot {
-      height: 4px;
-      flex: 1;
-      border-radius: 2px;
-      background: #2A2A2A;
-      transition: background 0.3s;
-    }
-    .progress-dot.done { background: #00D4D4; }
-    .progress-dot.active { background: #00A0A0; }
-
-    /* Steps */
-    .step { display: none; }
-    .step.visible { display: block; }
-
-    .q-label {
-      font-size: 13px;
-      color: #AAAAAA;
-      margin-bottom: 6px;
-      letter-spacing: 0.03em;
-    }
-    .q-text {
-      font-size: 22px;
-      font-weight: 600;
-      color: #FFFFFF;
-      margin-bottom: 1rem;
-      line-height: 1.35;
-    }
-    .q-hint {
-      font-size: 14px;
-      color: #9A9A9A;
-      margin-bottom: 1.5rem;
-      line-height: 1.6;
-    }
-
-    /* Options */
-    .options { display: flex; flex-direction: column; gap: 10px; }
-
-    .opt {
-      display: flex;
-      align-items: flex-start;
-      gap: 12px;
-      padding: 14px 16px;
-      border: 0.5px solid #2A2A2A;
-      border-radius: 10px;
-      cursor: pointer;
-      background: #1A1A1A;
-      transition: border-color 0.15s, background 0.15s;
-    }
-    .opt:hover { border-color: #444444; background: #222222; }
-    .opt.selected { border-color: #00D4D4; background: #0A2020; }
-
-    .opt-icon {
-      width: 20px;
-      height: 20px;
-      border-radius: 50%;
-      border: 1.5px solid #444444;
-      flex-shrink: 0;
-      margin-top: 1px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: background 0.15s, border-color 0.15s;
-    }
-    .opt.selected .opt-icon {
-      background: #00D4D4;
-      border-color: #00D4D4;
-    }
-    .opt-icon svg { display: none; }
-    .opt.selected .opt-icon svg { display: block; }
-
-    .opt-title {
-      font-size: 15px;
-      font-weight: 600;
-      color: #FFFFFF;
-      margin-bottom: 2px;
-    }
-    .opt.selected .opt-title { color: #00D4D4; }
-    .opt-desc { font-size: 14px; color: #CCCCCC; line-height: 1.4; }
-    .opt.selected .opt-desc { color: #00AAAA; }
-
-    /* Nav */
-    .nav { display: flex; justify-content: flex-end; margin-top: 1.5rem; }
-
-    .btn-next {
-      padding: 10px 24px;
-      font-size: 14px;
-      font-weight: 600;
-      border-radius: 8px;
-      border: 0.5px solid #2A2A2A;
-      background: #1A1A1A;
-      color: #9A9A9A;
-      cursor: default;
-      opacity: 0.5;
-      transition: all 0.15s;
-    }
-    .btn-next.ready {
-      opacity: 1;
-      cursor: pointer;
-      border-color: #00D4D4;
-      color: #00D4D4;
-    }
-    .btn-next.ready:hover { background: #0A2020; }
-
-    /* Result */
-    .result { display: none; }
-    .result.visible { display: block; }
-
-    .result-badge {
-      display: inline-block;
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 0.05em;
-      padding: 4px 12px;
-      border-radius: 20px;
-      margin-bottom: 14px;
-    }
-    .badge-native { background: #0A2020; color: #00D4D4; border: 0.5px solid #00D4D4; }
-    .badge-sdk { background: #0A1A2A; color: #00AACC; border: 0.5px solid #00AACC; }
-    .badge-contact { background: #2A1A0A; color: #CC8800; border: 0.5px solid #CC8800; }
-
-    .result-title {
-      font-size: 26px;
-      font-weight: 700;
-      color: #FFFFFF;
-      margin-bottom: 10px;
-    }
-    .result-sub {
-      font-size: 16px;
-      color: #FFFFFF;
-      line-height: 1.7;
-      margin-bottom: 1.5rem;
-    }
-
-    /* Result table */
-    .result-table {
-      border: 0.5px solid #2A2A2A;
-      border-radius: 10px;
       overflow: hidden;
-      margin-bottom: 1rem;
-    }
-    .result-table-head {
-      padding: 10px 16px;
-      background: #111111;
-      border-bottom: 0.5px solid #2A2A2A;
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 0.05em;
-      color: #AAAAAA;
-      text-transform: uppercase;
-    }
-    .result-row {
       display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      padding: 11px 16px;
-      border-bottom: 0.5px solid #2A2A2A;
-      gap: 16px;
+      flex-direction: column;
+      min-height: 480px;
     }
-    .result-row:last-child { border-bottom: none; }
-    .result-key { font-size: 14px; color: #CCCCCC; flex-shrink: 0; min-width: 130px; }
-    .result-val { font-size: 14px; color: #FFFFFF; text-align: right; line-height: 1.5; }
 
-    .tag {
-      display: inline-block;
-      font-size: 11px;
-      padding: 2px 8px;
-      border-radius: 20px;
-      margin-left: 6px;
-      vertical-align: middle;
+    .messages {
+      flex: 1;
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      overflow-y: auto;
+      max-height: 520px;
     }
-    .tag-cyan { background: #0A2020; color: #00D4D4; }
-    .tag-blue { background: #0A1A2A; color: #00AACC; }
 
-    .note {
+    .msg {
+      display: flex;
+      flex-direction: column;
+      max-width: 85%;
+    }
+    .msg.assistant { align-self: flex-start; }
+    .msg.user { align-self: flex-end; }
+
+    .msg-bubble {
+      padding: 11px 15px;
+      border-radius: 12px;
       font-size: 14px;
-      color: #CCCCCC;
-      line-height: 1.65;
-      padding: 12px 16px;
-      background: #111111;
-      border-radius: 8px;
+      line-height: 1.6;
+      white-space: pre-wrap;
+    }
+    .msg.assistant .msg-bubble {
+      background: #222222;
       border: 0.5px solid #2A2A2A;
-      margin-top: 12px;
+      color: #FFFFFF;
+      border-top-left-radius: 4px;
+    }
+    .msg.user .msg-bubble {
+      background: #00D4D4;
+      color: #0D0D0D;
+      font-weight: 500;
+      border-top-right-radius: 4px;
     }
 
-    /* Outcomes */
-    .outcomes { display: flex; flex-direction: column; gap: 10px; margin-bottom: 1.25rem; }
-    .outcome-row { display: flex; align-items: flex-start; gap: 10px; }
-    .outcome-check {
-      width: 18px;
-      height: 18px;
+    /* Verdict styling */
+    .verdict-block {
+      background: #111111;
+      border: 0.5px solid #2A2A2A;
+      border-radius: 10px;
+      padding: 14px 16px;
+      margin-top: 4px;
+      font-size: 13px;
+      line-height: 1.7;
+      color: #FFFFFF;
+      white-space: pre-wrap;
+    }
+    .verdict-fit { border-color: #00D4D4; }
+    .verdict-discuss { border-color: #CC8800; }
+    .verdict-notfit { border-color: #CC4444; }
+
+    /* Typing indicator */
+    .typing {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      padding: 11px 15px;
+      background: #222222;
+      border: 0.5px solid #2A2A2A;
+      border-radius: 12px;
+      border-top-left-radius: 4px;
+      width: fit-content;
+    }
+    .typing span {
+      width: 6px; height: 6px;
+      background: #9A9A9A;
       border-radius: 50%;
-      background: #0A2020;
-      flex-shrink: 0;
+      animation: bounce 1.2s infinite;
+    }
+    .typing span:nth-child(2) { animation-delay: 0.2s; }
+    .typing span:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes bounce {
+      0%, 60%, 100% { transform: translateY(0); }
+      30% { transform: translateY(-5px); }
+    }
+
+    /* Input area */
+    .input-area {
+      padding: 1rem 1.25rem;
+      border-top: 0.5px solid #2A2A2A;
+      display: flex;
+      gap: 10px;
+      align-items: flex-end;
+    }
+    .input-area textarea {
+      flex: 1;
+      background: #111111;
+      border: 0.5px solid #2A2A2A;
+      border-radius: 8px;
+      color: #FFFFFF;
+      font-size: 14px;
+      font-family: inherit;
+      padding: 10px 14px;
+      resize: none;
+      min-height: 42px;
+      max-height: 120px;
+      line-height: 1.5;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+    .input-area textarea:focus { border-color: #888; }
+    .input-area textarea::placeholder { color: #666; }
+
+    .send-btn {
+      width: 42px;
+      height: 42px;
+      background: #00D4D4;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      margin-top: 2px;
+      flex-shrink: 0;
+      transition: background 0.15s;
     }
-    .outcome-check.blue { background: #0A1A2A; }
-    .outcome-text { font-size: 15px; color: #FFFFFF; line-height: 1.5; }
+    .send-btn:hover { background: #00AAAA; }
+    .send-btn:disabled { background: #1A3A3A; cursor: default; }
+    .send-btn svg { width: 18px; height: 18px; }
 
-    .divider { height: 0.5px; background: #2A2A2A; margin: 1.5rem 0; }
-
-    .restart {
-      font-size: 14px;
-      color: #AAAAAA;
+    .restart-btn {
+      margin-top: 1rem;
+      font-size: 13px;
+      color: #CCCCCC;
+      background: none;
+      border: none;
       cursor: pointer;
       text-decoration: underline;
       text-underline-offset: 3px;
-      background: none;
-      border: none;
       padding: 0;
     }
-    .restart:hover { color: #FFFFFF; }
+    .restart-btn:hover { color: #FFFFFF; }
 
-    /* Outcomes toggle */
-    .tech-toggle {
-      font-size: 14px;
-      color: #AAAAAA;
-      cursor: pointer;
+    .empty-state {
+      flex: 1;
       display: flex;
       align-items: center;
-      gap: 6px;
-      background: none;
-      border: none;
-      padding: 0;
-      margin-bottom: 0;
+      justify-content: center;
+      color: #999;
+      font-size: 14px;
+      padding: 2rem;
+      text-align: center;
     }
-    .tech-toggle:hover { color: #FFFFFF; }
-    .tech-arrow { transition: transform 0.2s; display: inline-block; }
-    .tech-arrow.open { transform: rotate(90deg); }
-    .tech-detail { display: none; margin-top: 12px; }
-    .tech-detail.open { display: block; }
   </style>
 </head>
 <body>
+  <div class="logo">BANXA</div>
   <div class="page">
-    <div class="logo">BANXA</div>
 
-    <div class="card">
-      <div class="progress" id="progress">
-        <div class="progress-dot active" id="d0"></div>
-        <div class="progress-dot" id="d1"></div>
-        <div class="progress-dot" id="d2"></div>
+    <div class="mode-select">
+      <p class="mode-label">SELECT QUALIFIER</p>
+      <div class="mode-btns">
+        <button class="mode-btn" id="btn-native" onclick="selectMode('native')">
+          <strong>Banxa Native fit check</strong>
+          Is this partner right for Banxa Native?
+        </button>
+        <button class="mode-btn" id="btn-general" onclick="selectMode('general')">
+          <strong>General integration options</strong>
+          Which Banxa product fits this partner?
+        </button>
       </div>
-
-      <!-- Step 0 -->
-      <div class="step visible" id="step-0">
-        <p class="q-label">Question 1 of 3</p>
-        <p class="q-text">Do you verify your users' identity (KYC)?</p>
-        <p class="q-hint">Your platform collects and verifies user details — name, address, documents — either directly or via a provider like Sumsub.</p>
-        <div class="options">
-          <div class="opt" data-step="0" data-val="yes">
-            <div class="opt-icon"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l3 3 5-6" stroke="#0D0D0D" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-            <div>
-              <div class="opt-title">Yes — we do KYC</div>
-              <div class="opt-desc">We collect and verify user identity, or use a KYC provider</div>
-            </div>
-          </div>
-          <div class="opt" data-step="0" data-val="no">
-            <div class="opt-icon"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l3 3 5-6" stroke="#0D0D0D" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-            <div>
-              <div class="opt-title">No — we don't do KYC</div>
-              <div class="opt-desc">We don't collect or verify user identity ourselves</div>
-            </div>
-          </div>
-        </div>
-        <div class="nav"><button class="btn-next" id="next-0" onclick="advance(0)">Next →</button></div>
-      </div>
-
-      <!-- Step 1 -->
-      <div class="step" id="step-1">
-        <p class="q-label">Question 2 of 3</p>
-        <p class="q-text">Do you have a backend server?</p>
-        <p class="q-hint">A backend is required for HMAC server-to-server authentication with the Banxa eAPI.</p>
-        <div class="options">
-          <div class="opt" data-step="1" data-val="yes">
-            <div class="opt-icon"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l3 3 5-6" stroke="#0D0D0D" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-            <div>
-              <div class="opt-title">Yes — we have a backend</div>
-              <div class="opt-desc">We can make secure server-to-server API calls</div>
-            </div>
-          </div>
-          <div class="opt" data-step="1" data-val="no">
-            <div class="opt-icon"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l3 3 5-6" stroke="#0D0D0D" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-            <div>
-              <div class="opt-title">No — client-side only</div>
-              <div class="opt-desc">We're a client-first app without backend infrastructure</div>
-            </div>
-          </div>
-        </div>
-        <div class="nav"><button class="btn-next" id="next-1" onclick="advance(1)">Next →</button></div>
-      </div>
-
-      <!-- Step 2 -->
-      <div class="step" id="step-2">
-        <p class="q-label">Question 3 of 3</p>
-        <p class="q-text">Do you have a unique, persistent identifier per user?</p>
-        <p class="q-hint">E.g. a user account ID. Some wallets identify users only by wallet address with no persistent account model.</p>
-        <div class="options">
-          <div class="opt" data-step="2" data-val="yes">
-            <div class="opt-icon"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l3 3 5-6" stroke="#0D0D0D" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-            <div>
-              <div class="opt-title">Yes — we have user accounts</div>
-              <div class="opt-desc">Each user has a unique ID we can use as an identity reference</div>
-            </div>
-          </div>
-          <div class="opt" data-step="2" data-val="no">
-            <div class="opt-icon"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l3 3 5-6" stroke="#0D0D0D" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-            <div>
-              <div class="opt-title">No — wallet address only</div>
-              <div class="opt-desc">We identify users by wallet address, no persistent account model</div>
-            </div>
-          </div>
-        </div>
-        <div class="nav"><button class="btn-next" id="next-2" onclick="showResult()">See recommendation →</button></div>
-      </div>
-
-      <!-- Result -->
-      <div class="result" id="result"></div>
     </div>
+
+    <div class="chat-card">
+      <div class="messages" id="messages">
+        <div class="empty-state">Select a qualifier above to begin</div>
+      </div>
+      <div class="input-area">
+        <textarea id="input" placeholder="Type your answer..." rows="1" onkeydown="handleKey(event)" oninput="autoResize(this)" disabled></textarea>
+        <button class="send-btn" id="send-btn" onclick="sendMessage()" disabled>
+          <svg viewBox="0 0 24 24" fill="none" stroke="#0D0D0D" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="22" y1="2" x2="11" y2="13"></line>
+            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <button class="restart-btn" id="restart-btn" onclick="restart()" style="display:none">← Start over</button>
   </div>
 
   <script>
-    const answers = {};
+    const SYSTEM_NATIVE = `You are a qualification tool for Banxa Native, a headless ramp infrastructure product for partners embedding fiat ↔ crypto into their mobile app.
 
-    const checkCyan = `<svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l3 3 5-6" stroke="#00D4D4" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
-    const checkBlue = `<svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l3 3 5-6" stroke="#00AACC" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+Your job is to ask a short series of questions to determine whether a partner is a fit for Banxa Native, and if so, confirm the integration requirements. Output a clear verdict and a plain-language summary the BD team can use in the conversation.
 
-    function outcomeRow(text, blue) {
-      return `<div class="outcome-row"><div class="outcome-check ${blue ? 'blue' : ''}">${blue ? checkBlue : checkCyan}</div><span class="outcome-text">${text}</span></div>`;
-    }
+Ask the following questions one at a time, in order. Wait for an answer before continuing.
 
-    document.querySelectorAll('.opt').forEach(opt => {
-      opt.addEventListener('click', () => {
-        const step = opt.dataset.step;
-        document.querySelectorAll(`.opt[data-step="${step}"]`).forEach(o => o.classList.remove('selected'));
-        opt.classList.add('selected');
-        answers[step] = opt.dataset.val;
-        document.getElementById('next-' + step).classList.add('ready');
-      });
-    });
+1. What technology is the partner's app built on? (React Native, web, native iOS/Android, or something else?) The SDK is React Native only today — web and native iOS/Android are on the roadmap.
 
-    function advance(step) {
-      if (!answers[step]) return;
-      document.getElementById('step-' + step).classList.remove('visible');
-      if (answers[0] === 'no' && step === 0) { finishProgress(); showResult(); return; }
-      if (answers[1] === 'no' && step === 1) { finishProgress(); showResult(); return; }
-      const next = step + 1;
-      document.getElementById('d' + step).classList.remove('active');
-      document.getElementById('d' + step).classList.add('done');
-      if (document.getElementById('d' + next)) document.getElementById('d' + next).classList.add('active');
-      document.getElementById('step-' + next).classList.add('visible');
-    }
+2. Does the partner verify user identity (KYC)? This means collecting and checking personal details and documents — either directly or through a provider like Sumsub.
 
-    function finishProgress() {
-      document.querySelectorAll('.progress-dot').forEach(d => { d.classList.remove('active'); d.classList.add('done'); });
-    }
+3. Does the partner have backend infrastructure that can make server-to-server API calls?
 
-    function toggleTech() {
-      const detail = document.getElementById('tech-detail');
-      const arrow = document.getElementById('tech-arrow');
-      const label = document.getElementById('tech-label');
-      const isOpen = detail.classList.contains('open');
-      detail.classList.toggle('open');
-      arrow.classList.toggle('open');
-      label.textContent = isOpen ? 'Show technical details' : 'Hide technical details';
-    }
+4. Does the partner have a unique, stable identifier for each of their users (for example, an account ID or user ID — not just a wallet address)?
 
-    function techToggleBtn() {
-      return `<button class="tech-toggle" onclick="toggleTech()"><span class="tech-arrow" id="tech-arrow">›</span> <span id="tech-label">Show technical details</span></button>`;
-    }
+5. Does the partner's team have engineering resource available to implement an API + SDK integration?
 
-    function showResult() {
-      document.querySelectorAll('.step').forEach(s => s.classList.remove('visible'));
-      finishProgress();
+After all five answers, output:
 
-      const kyc = answers[0];
-      const backend = answers[1];
-      const uid = answers[2];
-      let html = '';
+---
+VERDICT: [FIT / NOT A FIT / DISCUSS FURTHER]
 
-      if (kyc === 'yes' && backend === 'yes' && uid === 'yes') {
-        html = `
-          <span class="result-badge badge-native">FULLY NATIVE</span>
-          <p class="result-title">Fully native integration</p>
-          <p class="result-sub">You own KYC, have a backend, and a persistent user model. Use the eAPI to orchestrate everything and the SDK for native payment execution.</p>
-          <div class="outcomes">
-            ${outcomeRow('Your users never leave your app')}
-            ${outcomeRow('Native payment sheet — cards, Apple Pay, Google Pay')}
-            ${outcomeRow('Headless bank transfers — no hosted checkout')}
-            ${outcomeRow('Your KYC reused — no duplicate verification for users')}
-            ${outcomeRow('Full UX and brand control throughout')}
-          </div>
-          ${techToggleBtn()}
-          <div class="tech-detail" id="tech-detail">
-            <div class="result-table">
-              <div class="result-table-head">Technical setup</div>
-              <div class="result-row"><span class="result-key">Auth</span><span class="result-val">HMAC server-to-server</span></div>
-              <div class="result-row"><span class="result-key">Identity & KYC</span><span class="result-val">eAPI — token share, reliance, or doc share</span></div>
-              <div class="result-row"><span class="result-key">Pricing & eligibility</span><span class="result-val">eAPI</span></div>
-              <div class="result-row"><span class="result-key">Bank transfers</span><span class="result-val">eAPI — fully API-driven</span></div>
-              <div class="result-row"><span class="result-key">Cards / Apple Pay / Google Pay</span><span class="result-val">SDK — Primer native sheet</span></div>
-              <div class="result-row"><span class="result-key">Status updates</span><span class="result-val">Webhooks + eAPI endpoints</span></div>
-            </div>
-          </div>`;
+Summary:
+[2-3 sentences describing whether the partner is a fit for Banxa Native and why, in plain language a BD person can use in conversation]
 
-      } else if (kyc === 'yes' && backend === 'yes' && uid === 'no') {
-        html = `
-          <span class="result-badge badge-native">FULLY NATIVE</span>
-          <p class="result-title">Fully native integration</p>
-          <p class="result-sub">You own KYC and have a backend. We can support wallet-based identity — the right setup is confirmed with your Banxa contact for your specific integration.</p>
-          <div class="outcomes">
-            ${outcomeRow('Your users never leave your app')}
-            ${outcomeRow('Native payment sheet — cards, Apple Pay, Google Pay')}
-            ${outcomeRow('Headless bank transfers — no hosted checkout')}
-            ${outcomeRow('Your KYC reused — no duplicate verification for users')}
-            ${outcomeRow('Full UX and brand control throughout')}
-          </div>
-          ${techToggleBtn()}
-          <div class="tech-detail" id="tech-detail">
-            <div class="result-table">
-              <div class="result-table-head">Technical setup</div>
-              <div class="result-row"><span class="result-key">Auth</span><span class="result-val">HMAC server-to-server</span></div>
-              <div class="result-row"><span class="result-key">Identity & KYC</span><span class="result-val">eAPI — token share, reliance, or doc share</span></div>
-              <div class="result-row"><span class="result-key">Pricing & eligibility</span><span class="result-val">eAPI</span></div>
-              <div class="result-row"><span class="result-key">Bank transfers</span><span class="result-val">eAPI — fully API-driven</span></div>
-              <div class="result-row"><span class="result-key">Cards / Apple Pay / Google Pay</span><span class="result-val">SDK — Primer native sheet</span></div>
-              <div class="result-row"><span class="result-key">Status updates</span><span class="result-val">Webhooks + eAPI endpoints</span></div>
-            </div>
-          </div>
-          <p class="note">Talk to your Banxa contact to design the right identity setup for your integration.</p>`;
+If NOT A FIT, add:
+Suggested next step:
+[One sentence on where to route the conversation]
 
-      } else if (kyc === 'yes' && backend === 'no') {
-        html = `
-          <span class="result-badge badge-contact">SPEAK TO US</span>
-          <p class="result-title">Contact the product team</p>
-          <p class="result-sub">You do KYC but don't have a backend. The fully native path isn't available as a standard integration today — but we can discuss options.</p>
-          <div class="result-table">
-            <div class="result-table-head">Options</div>
-            <div class="result-row"><span class="result-key">Interim option</span><span class="result-val">SDK-first with hosted webview</span></div>
-            <div class="result-row"><span class="result-key">Custom path</span><span class="result-val">Available for larger opportunities</span></div>
-          </div>
-          <p class="note">Get in touch with the Banxa product team to discuss your requirements.</p>`;
+If DISCUSS FURTHER, add:
+Open question:
+[The specific thing to flag to the product team]
+---
 
-      } else {
-        html = `
-          <span class="result-badge badge-sdk">SDK-FIRST</span>
-          <p class="result-title">SDK-first integration</p>
-          <p class="result-sub">Banxa handles compliance. First-time users onboard through a Banxa-hosted flow. Returning users transact natively — no webview, no redirect.</p>
-          <div class="outcomes">
-            ${outcomeRow('Fastest path to market — no compliance overhead', true)}
-            ${outcomeRow('First-time users: Banxa-hosted onboarding flow', true)}
-            ${outcomeRow('Returning users: native payment sheet, no webview', true)}
-            ${outcomeRow('SDK handles eligibility routing automatically', true)}
-            ${outcomeRow('Banxa owns compliance end to end', true)}
-          </div>
-          ${techToggleBtn()}
-          <div class="tech-detail" id="tech-detail">
-            <div class="result-table">
-              <div class="result-table-head">Technical setup</div>
-              <div class="result-row"><span class="result-key">Auth</span><span class="result-val">API key</span></div>
-              <div class="result-row"><span class="result-key">KYC & first-time flow</span><span class="result-val">Banxa hosted checkout <span class="tag tag-blue">webview</span></span></div>
-              <div class="result-row"><span class="result-key">Eligibility routing</span><span class="result-val">Handled by SDK</span></div>
-              <div class="result-row"><span class="result-key">Returning user payments</span><span class="result-val">SDK — Primer native sheet <span class="tag tag-cyan">no webview</span></span></div>
-              <div class="result-row"><span class="result-key">Bank transfers</span><span class="result-val">Banxa hosted checkout <span class="tag tag-blue">webview</span></span></div>
-              <div class="result-row"><span class="result-key">Status updates</span><span class="result-val">Webhooks</span></div>
-            </div>
-          </div>`;
-      }
+Rules:
+- Keep questions conversational, not clinical
+- Don't explain why you're asking each question
+- Don't output the verdict until all five questions are answered
+- Verdict of NOT A FIT if: no KYC, no backend, or no persistent user ID
+- Verdict of DISCUSS FURTHER if: they do KYC and have a backend but lack a persistent user ID, or they don't have a mobile app yet
+- Verdict of FIT if: yes to all five`;
 
-      html += `<div class="divider"></div><button class="restart" onclick="restart()">← Start over</button>`;
-      const r = document.getElementById('result');
-      r.innerHTML = html;
-      r.classList.add('visible');
+    const SYSTEM_GENERAL = `You are a qualification tool for Banxa's partner integration options. Banxa has four integration products:
+
+1. Banxa Checkout — Referral: URL-based, no backend needed, fastest to market. No webhooks or order lookup. Best for partners who want to go live quickly with minimal engineering.
+
+2. Banxa Checkout — REST API: Server-to-server, full control. Webhooks, KYC sharing, quote UI, order history. Best for partners who want programmatic control and real-time order status.
+
+3. Banxa Checkout — React Native SDK: Wraps the REST API for mobile apps. Type-safe, handles WebView plumbing, no backend needed for core flows. Best for mobile-first partners who want fast integration with native feel.
+
+4. Banxa Native: Headless ramp infrastructure for partners who do KYC and have a backend. Full UX control, native payment sheet (cards, Apple Pay, Google Pay), no Banxa-branded screens. Requires engineering capability.
+
+Your job is to ask a short series of questions and recommend the right product or combination.
+
+Ask one at a time, in order:
+
+1. What technology is the partner's app built on? Options: React Native, web, native iOS/Android, or a combination. Note: the SDK is React Native only today — web (JS SDK) and native iOS/Android are on the roadmap.
+
+2. Does the partner's platform verify user identity (KYC)? Either directly or through a provider like Sumsub?
+
+3. Does the partner have backend infrastructure for server-to-server API calls?
+
+4. Does the partner need real-time order status updates pushed to their system (webhooks)?
+
+5. Does the partner have engineering resource available for integration work?
+
+After all five answers, output:
+
+---
+RECOMMENDED PATH: [Product name]
+
+Why:
+[2-3 sentences explaining why this path fits]
+
+What they get:
+[2-3 bullet points on key outcomes]
+
+If relevant, add:
+Also consider:
+[One sentence on an adjacent option]
+---
+
+Rules:
+- Route to Banxa Native only if: they do KYC AND have a backend AND are building a mobile app
+- Route to React Native SDK if: mobile app, no KYC requirement, has engineering resource
+- Route to REST API if: web or both platforms, has backend, needs webhooks or KYC sharing
+- Route to Referral if: wants fastest path, no webhooks needed, minimal engineering
+- Never recommend Banxa Native to partners who don't do KYC
+- Keep the tone conversational and concise`;
+
+    let mode = null;
+    let history = [];
+    let loading = false;
+
+    function selectMode(m) {
+      mode = m;
+      document.getElementById('btn-native').classList.toggle('active', m === 'native');
+      document.getElementById('btn-general').classList.toggle('active', m === 'general');
+      restart();
     }
 
     function restart() {
-      Object.keys(answers).forEach(k => delete answers[k]);
-      document.querySelectorAll('.opt').forEach(o => o.classList.remove('selected'));
-      document.querySelectorAll('.btn-next').forEach(b => b.classList.remove('ready'));
-      document.querySelectorAll('.step').forEach(s => s.classList.remove('visible'));
-      document.getElementById('result').classList.remove('visible');
-      document.getElementById('result').innerHTML = '';
-      document.querySelectorAll('.progress-dot').forEach((d, i) => {
-        d.classList.remove('done', 'active');
-        if (i === 0) d.classList.add('active');
-      });
-      document.getElementById('step-0').classList.add('visible');
+      history = [];
+      const msgs = document.getElementById('messages');
+      msgs.innerHTML = '';
+      document.getElementById('input').disabled = false;
+      document.getElementById('send-btn').disabled = false;
+      document.getElementById('restart-btn').style.display = 'none';
+      if (mode) startConversation();
+    }
+
+    async function startConversation() {
+      await callClaude('Start the qualification. Ask the first question.');
+    }
+
+    function addMessage(role, text, isVerdict) {
+      const msgs = document.getElementById('messages');
+
+      // Remove empty state
+      const empty = msgs.querySelector('.empty-state');
+      if (empty) empty.remove();
+
+      const wrapper = document.createElement('div');
+      wrapper.className = `msg ${role}`;
+
+      if (role === 'assistant' && isVerdict) {
+        const bubble = document.createElement('div');
+        bubble.className = 'msg-bubble';
+        bubble.textContent = text.split('---')[0].trim();
+        wrapper.appendChild(bubble);
+
+        const verdict = document.createElement('div');
+        const verdictText = text.includes('---') ? text.split('---')[1].trim() : '';
+        if (verdictText) {
+          verdict.className = 'verdict-block';
+          if (verdictText.includes('FIT\n') && !verdictText.includes('NOT A FIT') && !verdictText.includes('DISCUSS')) verdict.classList.add('verdict-fit');
+          else if (verdictText.includes('NOT A FIT')) verdict.classList.add('verdict-notfit');
+          else if (verdictText.includes('DISCUSS FURTHER') || verdictText.includes('RECOMMENDED PATH')) verdict.classList.add('verdict-discuss');
+          verdict.textContent = verdictText;
+          wrapper.appendChild(verdict);
+        }
+      } else {
+        const bubble = document.createElement('div');
+        bubble.className = 'msg-bubble';
+        bubble.textContent = text;
+        wrapper.appendChild(bubble);
+      }
+
+      msgs.appendChild(wrapper);
+      msgs.scrollTop = msgs.scrollHeight;
+      return wrapper;
+    }
+
+    function showTyping() {
+      const msgs = document.getElementById('messages');
+      const t = document.createElement('div');
+      t.className = 'msg assistant';
+      t.id = 'typing';
+      t.innerHTML = '<div class="typing"><span></span><span></span><span></span></div>';
+      msgs.appendChild(t);
+      msgs.scrollTop = msgs.scrollHeight;
+    }
+
+    function removeTyping() {
+      const t = document.getElementById('typing');
+      if (t) t.remove();
+    }
+
+    async function callClaude(userMsg) {
+      if (loading) return;
+      loading = true;
+
+      const systemPrompt = mode === 'native' ? SYSTEM_NATIVE : SYSTEM_GENERAL;
+
+      history.push({ role: 'user', content: userMsg });
+      showTyping();
+
+      document.getElementById('input').disabled = true;
+      document.getElementById('send-btn').disabled = true;
+
+      try {
+        const res = await fetch('https://api.anthropic.com/v1/messages', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            model: 'claude-sonnet-4-20250514',
+            max_tokens: 1000,
+            system: systemPrompt,
+            messages: history
+          })
+        });
+
+        const data = await res.json();
+        const reply = data.content?.[0]?.text || 'Something went wrong — please try again.';
+
+        removeTyping();
+        history.push({ role: 'assistant', content: reply });
+
+        const isVerdict = reply.includes('VERDICT:') || reply.includes('RECOMMENDED PATH:');
+        addMessage('assistant', reply, isVerdict);
+
+        if (isVerdict) {
+          document.getElementById('input').disabled = true;
+          document.getElementById('send-btn').disabled = true;
+          document.getElementById('restart-btn').style.display = 'block';
+        } else {
+          document.getElementById('input').disabled = false;
+          document.getElementById('send-btn').disabled = false;
+          document.getElementById('input').focus();
+        }
+
+      } catch (err) {
+        removeTyping();
+        addMessage('assistant', 'Something went wrong — please refresh and try again.');
+      }
+
+      loading = false;
+    }
+
+    async function sendMessage() {
+      const input = document.getElementById('input');
+      const text = input.value.trim();
+      if (!text || loading) return;
+
+      input.value = '';
+      autoResize(input);
+      addMessage('user', text);
+      await callClaude(text);
+    }
+
+    function handleKey(e) {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        sendMessage();
+      }
+    }
+
+    function autoResize(el) {
+      el.style.height = 'auto';
+      el.style.height = Math.min(el.scrollHeight, 120) + 'px';
     }
   </script>
 </body>
